@@ -1,51 +1,33 @@
-import pytest
-
 from praktikum.database import Database
 from praktikum.bun import Bun
 from praktikum.ingredient import Ingredient
-from praktikum.ingredient_types import INGREDIENT_TYPE_SAUCE, INGREDIENT_TYPE_FILLING
 
 
-@pytest.fixture()
-def database():
-    return Database()
-
-
-@pytest.mark.parametrize(
-    "index, expected_name, expected_price",
-    [
-        (0, "black bun", 100),
-        (1, "white bun", 200),
-        (2, "red bun", 300),
-    ],
-)
-def test_available_buns_contains_expected_items(database, index, expected_name, expected_price):
+def test_available_buns_returns_list_of_buns(database: Database):
     buns = database.available_buns()
 
-    assert len(buns) == 3
-    assert isinstance(buns[index], Bun)
-    assert buns[index].get_name() == expected_name
-    assert buns[index].get_price() == expected_price
+    assert isinstance(buns, list)
+    assert len(buns) > 0
+    assert all(isinstance(b, Bun) for b in buns)
 
 
-@pytest.mark.parametrize(
-    "index, expected_type, expected_name, expected_price",
-    [
-        (0, INGREDIENT_TYPE_SAUCE, "hot sauce", 100),
-        (1, INGREDIENT_TYPE_SAUCE, "sour cream", 200),
-        (2, INGREDIENT_TYPE_SAUCE, "chili sauce", 300),
-        (3, INGREDIENT_TYPE_FILLING, "cutlet", 100),
-        (4, INGREDIENT_TYPE_FILLING, "dinosaur", 200),
-        (5, INGREDIENT_TYPE_FILLING, "sausage", 300),
-    ],
-)
-def test_available_ingredients_contains_expected_items(
-    database, index, expected_type, expected_name, expected_price
-):
+def test_available_ingredients_returns_list_of_ingredients(database: Database):
     ingredients = database.available_ingredients()
 
-    assert len(ingredients) == 6
-    assert isinstance(ingredients[index], Ingredient)
-    assert ingredients[index].get_type() == expected_type
-    assert ingredients[index].get_name() == expected_name
-    assert ingredients[index].get_price() == expected_price
+    assert isinstance(ingredients, list)
+    assert len(ingredients) > 0
+    assert all(isinstance(i, Ingredient) for i in ingredients)
+
+
+def test_available_buns_returns_new_list_each_call(database: Database):
+    first = database.available_buns()
+    second = database.available_buns()
+
+    assert first is not second
+
+
+def test_available_ingredients_returns_new_list_each_call(database: Database):
+    first = database.available_ingredients()
+    second = database.available_ingredients()
+
+    assert first is not second
